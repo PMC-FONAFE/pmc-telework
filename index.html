@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f5f4f1;font-family:system-ui,-apple-system,sans-serif;color:#1a1917;padding:24px}
+.card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.06),0 0 0 1px #e8e5df}
+.leg{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:24px;padding:11px 14px;background:#f9f8f6;border-radius:8px;border:1px solid #e4e1db}
+.leg-lbl{font-size:11px;color:#565A5C;margin-right:4px;font-weight:500}
+.pip{display:inline-flex;align-items:center;padding:4px 11px;border-radius:6px;font-size:11px;font-weight:600;border:1.5px solid}
+.p-an{background:#e8eef6;color:#0D4882;border-color:#0D4882}
+.p-vi{background:#eaf0ec;color:#3a5c3a;border-color:#67735E}
+.p-me{background:#f9f0ea;color:#8a5a2a;border-color:#BF895A}
+.p-my{background:#f5eaec;color:#73303C;border-color:#73303C}
+.p-fer{background:#f2f1ef;color:#565A5C;border-color:#ccc9c2;font-style:italic;font-weight:400}
+.mhdr{font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin:28px 0 12px;padding:6px 14px;background:#CD202C;border-radius:6px;display:inline-block}
+.mhdr:first-child{margin-top:0}
+.wb{margin-bottom:14px}
+.wlbl{font-size:9px;color:#aaa;letter-spacing:.07em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:8px;font-weight:500}
+.wnote{font-size:9px;color:#7a3030;background:#fceaea;border:1px solid #f0c0c0;padding:2px 8px;border-radius:5px;text-transform:none;letter-spacing:0;font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.dc{border-radius:10px;padding:12px 11px;min-height:96px;border:1.5px solid #e4e1db;background:#fff}
+.dc.feriado{background:#f5f4f1;border:1.5px dashed #ccc9c2}
+.dc-day{font-size:9px;font-weight:600;color:#bbb;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px}
+.dc-num{font-size:18px;font-weight:500;color:#1a1917;line-height:1;margin-bottom:9px}
+.tel-list{display:flex;flex-direction:column;gap:4px}
+.b{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10px;font-weight:600;border:1.5px solid}
+.b-an{background:#e8eef6;color:#0D4882;border-color:#0D4882}
+.b-vi{background:#eaf0ec;color:#3a5c3a;border-color:#67735E}
+.b-me{background:#f9f0ea;color:#8a5a2a;border-color:#BF895A}
+.b-my{background:#f5eaec;color:#73303C;border-color:#73303C}
+.fer-lbl{font-size:9px;color:#CD202C;font-weight:500;line-height:1.5;margin-top:2px}
+
+/* ── RESUMEN ── */
+.sum-wrap{margin-top:28px;padding:20px;background:#f9f8f6;border-radius:12px;border:1px solid #e4e1db}
+.sum-title{font-size:10px;font-weight:700;color:#565A5C;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+
+/* Tarjetas totales — fila horizontal */
+.cards-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.sc{padding:14px 12px 12px;background:#fff;border-radius:10px;border:1px solid #e4e1db;display:flex;flex-direction:column;align-items:center;gap:2px}
+.sc-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;margin-bottom:4px;flex-shrink:0}
+.av-an{background:#0D4882}
+.av-vi{background:#2D6B2D}
+.av-me{background:#A0620A}
+.av-my{background:#73303C}
+.sc-n{font-size:11px;color:#565A5C;font-weight:600}
+.sc-v{font-size:26px;font-weight:700;color:#1a1917;line-height:1;margin-top:2px}
+.sc-s{font-size:9px;color:#aaa}
+
+/* Tabla: personas=filas, días=columnas */
+.day-table{width:100%;border-collapse:collapse;font-size:11px}
+.day-table th{padding:7px 12px;font-size:9px;font-weight:700;color:#888;letter-spacing:.07em;text-transform:uppercase;border-bottom:2px solid #e4e1db;text-align:center}
+.day-table th:first-child{text-align:left}
+.day-table td{padding:7px 12px;border-bottom:1px solid #f0ede8;text-align:center}
+.day-table td:first-child{text-align:left}
+.day-table tr:last-child td{border-bottom:none}
+.day-table tr:hover td{background:#fafaf8}
+.person-cell{display:flex;align-items:center;gap:8px}
+.avatar-sm{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.num-cell{font-size:13px;font-weight:600;color:#1a1917}
+.total-lbl{font-size:11px;font-weight:700;color:#565A5C}
+</style>
+</head>
+<body>
+<div class="card">
+<h1 style="font-size:18px;font-weight:700;color:#1a1917;letter-spacing:.02em;margin-bottom:20px;padding-bottom:14px;border-bottom:3px solid #CD202C;">
+  Calendario de Teletrabajo — Área PMC
+</h1>
+<div class="leg">
+  <span class="leg-lbl">📡 Teletrabajo:</span>
+  <span class="pip p-an">Andrés</span>
+  <span class="pip p-vi">Victor</span>
+  <span class="pip p-me">Mela</span>
+  <span class="pip p-my">Mey</span>
+  <span style="width:1px;height:14px;background:#dedad3;display:inline-block;margin:0 3px"></span>
+  <span class="pip p-fer">feriado / no laborable</span>
+</div>
+<div id="cal"></div>
+
+<div class="sum-wrap">
+  <div class="sum-title">Resumen de teletrabajo</div>
+
+  <!-- Tarjetas totales -->
+  <div class="cards-row" id="cards"></div>
+
+  <!-- Tabla: personas = filas, días = columnas -->
+  <table class="day-table">
+    <thead>
+      <tr>
+        <th>Persona</th>
+        <th>Lunes</th>
+        <th>Martes</th>
+        <th>Miércoles</th>
+        <th>Jueves</th>
+        <th>Viernes</th>
+      </tr>
+    </thead>
+    <tbody id="daybody"></tbody>
+  </table>
+</div>
+</div>
+
+<script>
+const P=1,T=0,F=-1;
+const DN=['Lun','Mar','Mié','Jue','Vie'];
+const FLAB={'2026-6-29':'San Pedro y San Pablo','2026-7-23':'Día FAP','2026-7-27':'No laborable','2026-7-28':'Fiestas Patrias','2026-7-29':'Fiestas Patrias'};
+const WK=[['An','Andrés','b-an','av-an','#0D4882'],['Vi','Victor','b-vi','av-vi','#2D6B2D'],['Me','Mela','b-me','av-me','#A0620A'],['My','Mey','b-my','av-my','#73303C']];
+function fkey(d){return`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`}
+function addD(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r}
+
+const weeksFixed=[
+  {label:'15 – 19 jun',month:5,note:'',start:new Date(2026,5,15),
+   days:[
+    {An:P,Vi:T,Me:P,My:P},{An:T,Vi:P,Me:T,My:P},{An:P,Vi:P,Me:P,My:T},
+    {An:P,Vi:T,Me:T,My:P},{An:T,Vi:P,Me:P,My:T}]},
+  {label:'22 – 26 jun',month:5,note:'',start:new Date(2026,5,22),
+   days:[
+    {An:T,Vi:P,Me:P,My:P},{An:P,Vi:T,Me:P,My:T},{An:T,Vi:P,Me:T,My:P},
+    {An:P,Vi:P,Me:P,My:T},{An:P,Vi:T,Me:T,My:P}]},
+  {label:'29 jun – 3 jul',month:5,note:'1 feriado → máx 1 tel/persona',start:new Date(2026,5,29),
+   days:[
+    {An:F,Vi:F,Me:F,My:F},{An:T,Vi:P,Me:P,My:P},{An:P,Vi:T,Me:P,My:P},
+    {An:P,Vi:P,Me:T,My:P},{An:P,Vi:P,Me:P,My:T}]},
+  {label:'6 – 10 jul',month:6,note:'',start:new Date(2026,6,6),
+   days:[
+    {An:P,Vi:T,Me:P,My:T},{An:T,Vi:P,Me:P,My:P},{An:P,Vi:T,Me:T,My:P},
+    {An:T,Vi:P,Me:P,My:T},{An:P,Vi:P,Me:T,My:P}]},
+  {label:'13 – 17 jul',month:6,note:'',start:new Date(2026,6,13),
+   days:[
+    {An:T,Vi:P,Me:T,My:P},{An:P,Vi:T,Me:P,My:T},{An:P,Vi:P,Me:P,My:P},
+    {An:P,Vi:T,Me:T,My:P},{An:T,Vi:P,Me:P,My:T}]},
+  {label:'20 – 24 jul',month:6,note:'1 feriado (jue 23) → máx 1 tel/persona',start:new Date(2026,6,20),
+   days:[
+    {An:P,Vi:P,Me:T,My:P},{An:P,Vi:P,Me:P,My:T},{An:T,Vi:P,Me:P,My:P},
+    {An:F,Vi:F,Me:F,My:F},{An:P,Vi:T,Me:P,My:P}]},
+  {label:'27 – 31 jul',month:6,note:'3 feriados → todos presencial jue y vie',start:new Date(2026,6,27),
+   days:[
+    {An:F,Vi:F,Me:F,My:F},{An:F,Vi:F,Me:F,My:F},{An:F,Vi:F,Me:F,My:F},
+    {An:P,Vi:P,Me:P,My:P},{An:P,Vi:P,Me:P,My:P}]},
+];
+
+const SCLS={An:'b-an',Vi:'b-vi',Me:'b-me',My:'b-my'};
+const telC={An:0,Vi:0,Me:0,My:0};
+const telDay={An:[0,0,0,0,0],Vi:[0,0,0,0,0],Me:[0,0,0,0,0],My:[0,0,0,0,0]};
+const cal=document.getElementById('cal');
+let lastM=null;
+
+weeksFixed.forEach(wk=>{
+  if(wk.month!==lastM){
+    const mh=document.createElement('div');mh.className='mhdr';
+    mh.textContent=wk.month===5?'Junio 2026':'Julio 2026';
+    cal.appendChild(mh);lastM=wk.month;
+  }
+  const wb=document.createElement('div');wb.className='wb';
+  const wl=document.createElement('div');wl.className='wlbl';wl.textContent=wk.label;
+  if(wk.note){const wn=document.createElement('span');wn.className='wnote';wn.textContent=wk.note;wl.appendChild(wn);}
+  wb.appendChild(wl);
+  const grid=document.createElement('div');grid.className='grid';
+  wk.days.forEach((slot,i)=>{
+    const date=addD(wk.start,i);
+    const key=fkey(date);
+    const isFer=slot.An===F;
+    const telWorkers=WK.filter(([k])=>slot[k]===T);
+    const col=document.createElement('div');
+    col.className='dc'+(isFer?' feriado':'');
+    const dd=document.createElement('div');dd.className='dc-day';dd.textContent=DN[i];
+    const dn=document.createElement('div');dn.className='dc-num';dn.textContent=date.getDate();
+    col.appendChild(dd);col.appendChild(dn);
+    if(isFer){
+      const ft=document.createElement('div');ft.className='fer-lbl';
+      ft.textContent='✕  '+(FLAB[key]||'No laborable');
+      col.appendChild(ft);
+    } else if(telWorkers.length===0){
+      const tl=document.createElement('div');
+      tl.style.cssText='font-size:9px;color:#d0cdc7;font-style:italic;margin-top:2px';
+      tl.textContent='—';col.appendChild(tl);
+    } else {
+      const bl=document.createElement('div');bl.className='tel-list';
+      telWorkers.forEach(([k,name])=>{
+        const b=document.createElement('span');b.className='b '+SCLS[k];b.textContent=name;
+        bl.appendChild(b);telC[k]++;telDay[k][i]++;
+      });
+      col.appendChild(bl);
+    }
+    grid.appendChild(col);
+  });
+  wb.appendChild(grid);cal.appendChild(wb);
+});
+
+// Tarjetas totales con avatar circular
+const cardsEl=document.getElementById('cards');
+WK.forEach(([k,name,,avcls,color])=>{
+  const sc=document.createElement('div');sc.className='sc';
+  const av=document.createElement('div');av.className='sc-avatar '+avcls;
+  av.textContent=name[0]; // inicial
+  const nm=document.createElement('div');nm.className='sc-n';nm.textContent=name;
+  const tv=document.createElement('div');tv.className='sc-v';tv.textContent=telC[k];
+  const sub=document.createElement('div');sub.className='sc-s';sub.textContent='días teletrabajo';
+  sc.appendChild(av);sc.appendChild(nm);sc.appendChild(tv);sc.appendChild(sub);
+  cardsEl.appendChild(sc);
+});
+
+// Tabla: filas=personas, columnas=días
+const tbody=document.getElementById('daybody');
+WK.forEach(([k,name,bcls,avcls,color])=>{
+  const tr=document.createElement('tr');
+  // celda nombre con avatar
+  const tdName=document.createElement('td');
+  tdName.innerHTML=`<div class="person-cell"><div class="avatar-sm ${avcls}">${name[0]}</div><span style="font-weight:600;color:#1a1917">${name}</span></div>`;
+  tr.appendChild(tdName);
+  // celdas días
+  [0,1,2,3,4].forEach(i=>{
+    const td=document.createElement('td');
+    td.innerHTML=`<span class="num-cell">${telDay[k][i]}</span>`;
+    tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>
