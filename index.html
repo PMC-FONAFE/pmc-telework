@@ -1,332 +1,523 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Calendario PMC — Supabase Nativo</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#f5f4f1;font-family:system-ui,-apple-system,sans-serif;color:#1a1917;padding:24px}
-.card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.06),0 0 0 1px #e8e5df}
-.leg{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:24px;padding:11px 14px;background:#f9f8f6;border-radius:8px;border:1px solid #e4e1db}
-.leg-lbl{font-size:11px;color:#565A5C;margin-right:4px;font-weight:500}
-.pip{display:inline-flex;align-items:center;padding:4px 11px;border-radius:6px;font-size:11px;font-weight:600;border:1.5px solid}
-.p-an{background:#e8eef6;color:#0D4882;border-color:#0D4882}
-.p-vi{background:#eaf0ec;color:#3a5c3a;border-color:#67735E}
-.p-me{background:#f9f0ea;color:#8a5a2a;border-color:#BF895A}
-.p-my{background:#f5eaec;color:#73303C;border-color:#73303C}
-.p-ml{background:#e0f0f2;color:#004E5C;border-color:#004E5C}
-.p-fer{background:#f2f1ef;color:#565A5C;border-color:#ccc9c2;font-style:italic;font-weight:400}
-.mhdr{font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin:28px 0 12px;padding:6px 14px;background:#CD202C;border-radius:6px;display:inline-block}
-.mhdr:first-child{margin-top:0}
-.wb{margin-bottom:14px}
-.wlbl{font-size:9px;color:#aaa;letter-spacing:.07em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:8px;font-weight:500}
-.wnote{font-size:9px;color:#7a3030;background:#fceaea;border:1px solid #f0c0c0;padding:2px 8px;border-radius:5px;text-transform:none;letter-spacing:0;font-weight:500}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.dc{border-radius:10px;padding:12px 11px;min-height:96px;border:1.5px solid #e4e1db;background:#fff}
+body{background:#f5f4f1;font-family:system-ui,-apple-system,sans-serif;color:#1a1917;padding:10px;min-width:320px}
+@media(min-width:768px){body{padding:20px}}
+
+.card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06),0 0 0 1px #e8e5df;max-width:1024px;margin:0 auto;width:100%;overflow:hidden}
+@media(min-width:768px){.card{padding:20px}}
+
+.header-container{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:10px;border-bottom:3px solid #CD202C}
+h1{font-size:15px;font-weight:700;color:#1a1917;letter-spacing:.02em;line-height:1.3}
+@media(min-width:768px){h1{font-size:18px}}
+
+.controls{display:flex;gap:10px;justify-content:center;align-items:center;margin-bottom:14px;position:relative}
+.nav-mes{display:flex;align-items:center;gap:4px}
+
+.btn{background:#fff;border:1px solid #ccc9c2;padding:5px 8px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:#1a1917;user-select:none}
+.btn:hover{background:#f9f8f6}
+
+.mes-selector-btn{font-weight:700;font-size:13px;padding:5px 14px;border-radius:6px;cursor:pointer;background:#CD202C;color:#fff;border:1px solid #CD202C;min-width:140px;text-align:center;display:inline-block;user-select:none;transition:background 0.2s}
+.mes-selector-btn:hover{background:#b31c26;border-color:#b31c26}
+
+/* Pop-up Selector de Fecha Avanzado */
+.pop-datepicker{display:none;position:absolute;top:36px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #ccc9c2;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.15);padding:12px;z-index:100;width:280px}
+.pop-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid #f0ede8;padding-bottom:6px}
+.pop-title{font-weight:700;font-size:13px;cursor:pointer;color:#1a1917;padding:2px 6px;border-radius:4px}
+.pop-title:hover{background:#f5f4f1}
+.pop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.pop-cell{padding:6px 2px;font-size:11px;font-weight:600;border-radius:6px;cursor:pointer;border:1px solid transparent}
+.pop-cell:hover{background:#f5f4f1;border-color:#ccc9c2}
+.pop-cell.active{background:#CD202C;color:#fff;border-color:#CD202C}
+
+/* Leyenda de Píldoras */
+.leg{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px;padding:8px;background:#f9f8f6;border-radius:8px;border:1px solid #e4e1db}
+.leg-lbl{font-size:11px;color:#565A5C;font-weight:600;width:100%;margin-bottom:2px}
+@media(min-width:600px){.leg-lbl{width:auto;margin-bottom:0;margin-right:4px}}
+.pip{display:inline-flex;align-items:center;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;border:1.5px solid;cursor:pointer;transition:all 0.2s ease;user-select:none}
+.pip:active{transform:scale(0.96)}
+
+.pip.p-an{background:#e8eef6;color:#0D4882;border-color:#0D4882}
+.pip.p-vi{background:#eaf0ec;color:#3a5c3a;border-color:#67735E}
+.pip.p-me{background:#f9f0ea;color:#8a5a2a;border-color:#BF895A}
+.pip.p-my{background:#f5eaec;color:#73303C;border-color:#73303C}
+.pip.p-ml{background:#e0f0f2;color:#004E5C;border-color:#004E5C}
+.pip.p-vac{background:#f2f1ef;color:#565A5C;border-color:#ccc9c2}
+.pip.p-fer{background:#f2f1ef;color:#565A5C;border-color:#ccc9c2}
+
+/* Contenedor de Semanas */
+.wb{margin-bottom:10px}
+.wlbl{font-size:9px;color:#777;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-weight:600}
+.wnote{font-size:8.5px;color:#7a3030;background:#fceaea;border:1px solid #f0c0c0;padding:1px 5px;border-radius:4px;text-transform:none;letter-spacing:0;font-weight:500}
+
+/* Grid del Calendario - Forzado estricto a 5 columnas de L a V en Móvil y Desktop */
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+@media(min-width:768px){.grid{gap:6px}}
+
+/* Compactación extrema para asegurar visualización de 5 semanas */
+.dc{border-radius:6px;padding:4px;min-height:58px;border:1.5px solid #e4e1db;background:#fff;display:flex;flex-direction:column;justify-content:flex-start;transition:opacity 0.2s ease}
+@media(min-width:768px){.dc{padding:6px;min-height:74px;gap:2px}}
 .dc.feriado{background:#f5f4f1;border:1.5px dashed #ccc9c2}
-.dc-day{font-size:9px;font-weight:600;color:#bbb;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px}
-.dc-num{font-size:18px;font-weight:500;color:#1a1917;line-height:1;margin-bottom:9px}
-.tel-list{display:flex;flex-direction:column;gap:4px}
-.b{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10px;font-weight:600;border:1.5px solid}
+
+.dc-header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;width:100%}
+.dc-day{font-size:8px;font-weight:700;color:#aaa;letter-spacing:.01em;text-transform:uppercase}
+.dc-num{font-size:12px;font-weight:600;color:#1a1917;line-height:1}
+@media(min-width:768px){.dc-num{font-size:14px}}
+
+.tel-list{display:flex;flex-direction:column;gap:2px;width:100%}
+.b{display:block;padding:1.5px 2px;border-radius:3px;font-size:8.5px;font-weight:600;border:1px solid;line-height:1.1;text-align:center;width:100%;transition:opacity 0.2s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(min-width:768px){.b{padding:2px 4px;font-size:9.5px;border:1.5px solid}}
 .b-an{background:#e8eef6;color:#0D4882;border-color:#0D4882}
 .b-vi{background:#eaf0ec;color:#3a5c3a;border-color:#67735E}
 .b-me{background:#f9f0ea;color:#8a5a2a;border-color:#BF895A}
 .b-my{background:#f5eaec;color:#73303C;border-color:#73303C}
 .b-ml{background:#e0f0f2;color:#004E5C;border-color:#004E5C}
-.fer-lbl{font-size:9px;color:#CD202C;font-weight:500;line-height:1.5;margin-top:2px}
-/* ── RESUMEN ── */
-.sum-wrap{margin-top:28px;padding:20px;background:#f9f8f6;border-radius:12px;border:1px solid #e4e1db}
-.sum-title{font-size:10px;font-weight:700;color:#565A5C;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
-.cards-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
-.sc{padding:14px 12px 12px;background:#fff;border-radius:10px;border:1px solid #e4e1db;display:flex;flex-direction:column;align-items:center;gap:2px}
-.sc-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;margin-bottom:4px;flex-shrink:0}
+
+.fer-lbl{
+  font-size: 8px;
+  color: #CD202C;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-top: 1px;
+  transition: opacity 0.2s ease;
+  white-space: normal !important;
+  word-break: break-word;
+}
+@media(min-width:768px){
+  .fer-lbl{font-size:9px}
+}
+
+/* Resumen de teletrabajo */
+.sum-wrap{margin-top:16px;padding:12px;background:#f9f8f6;border-radius:12px;border:1px solid #e4e1db}
+@media(min-width:768px){.sum-wrap{padding:16px}}
+.sum-title{font-size:10px;font-weight:700;color:#565A5C;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+
+.cards-row{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:12px}
+@media(min-width:480px){.cards-row{grid-template-columns:repeat(5,1fr);gap:6px}}
+
+.sc{padding:6px 4px;background:#fff;border-radius:8px;border:1px solid #e4e1db;display:flex;flex-direction:column;align-items:center;gap:1px}
+.sc-avatar{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-bottom:1px}
 .av-an{background:#0D4882}
 .av-vi{background:#2D6B2D}
 .av-me{background:#A0620A}
 .av-my{background:#73303C}
 .av-ml{background:#004E5C}
-.sc-n{font-size:11px;color:#565A5C;font-weight:600}
-.sc-v{font-size:26px;font-weight:700;color:#1a1917;line-height:1;margin-top:2px}
-.sc-s{font-size:9px;color:#aaa}
-.day-table{width:100%;border-collapse:collapse;font-size:11px}
-.day-table th{padding:7px 12px;font-size:9px;font-weight:700;color:#888;letter-spacing:.07em;text-transform:uppercase;border-bottom:2px solid #e4e1db;text-align:center}
-.day-table th:first-child{text-align:left}
-.day-table td{padding:7px 12px;border-bottom:1px solid #f0ede8;text-align:center}
+.sc-n{font-size:9.5px;color:#565A5C;font-weight:600}
+.sc-v{font-size:16px;font-weight:700;color:#1a1917;line-height:1}
+@media(min-width:768px){.sc-v{font-size:20px}.sc-avatar{width:24px;height:24px}}
+.sc-s{font-size:8px;color:#aaa}
+
+/* Ajustes Responsivos y Compactación de la Tabla Inferior */
+.table-responsive{width:100%;overflow-x:hidden}
+.day-table{width:100%;border-collapse:collapse;font-size:10px}
+.day-table th{padding:4px 2px;font-size:8.5px;font-weight:700;color:#888;border-bottom:2px solid #e4e1db;text-align:center}
+
+.day-table th:first-child{text-align:left;width:22%}
+.day-table td{padding:5px 2px;border-bottom:1px solid #f0ede8;text-align:center}
 .day-table td:first-child{text-align:left}
-.day-table tr:last-child td{border-bottom:none}
-.day-table tr:hover td{background:#fafaf8}
-.person-cell{display:flex;align-items:center;gap:8px}
-.avatar-sm{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
-.num-cell{font-size:13px;font-weight:600;color:#1a1917}
+
+.day-table tr:nth-child(even) td {border-bottom: none; background: #fff}
+
+.person-cell{display:flex;align-items:center;gap:3px}
+.avatar-sm{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0}
+.num-cell{font-size:11px;font-weight:600;color:#1a1917}
+
+/* Control Responsivo de las cabeceras de los días */
+.d-long { display: none; }
+.d-short { display: inline; }
+@media(min-width: 600px) {
+  .d-long { display: inline; }
+  .d-short { display: none; }
+}
+
+/* Efecto Atenuado Global al 15% */
+.atenuado{opacity:0.15 !important}
 </style>
 </head>
 <body>
 <div class="card">
-<h1 style="font-size:18px;font-weight:700;color:#1a1917;letter-spacing:.02em;margin-bottom:20px;padding-bottom:14px;border-bottom:3px solid #CD202C;">
-  Calendario de Teletrabajo y Vacaciones — Área PMC
-</h1>
-<div class="leg">
-  <span class="leg-lbl">📡 Teletrabajo:</span>
-  <span class="pip p-an">Andrés</span>
-  <span class="pip p-vi">Victor</span>
-  <span class="pip p-me">Mela</span>
-  <span class="pip p-my">Mey</span>
-  <span class="pip p-ml">Meli</span>
-  <span style="width:1px;height:14px;background:#dedad3;display:inline-block;margin:0 3px"></span>
-  <span class="pip p-fer">🌴 vacaciones</span>
-  <span class="pip p-fer">feriado / no laborable</span>
-</div>
-<div id="cal"></div>
+  <div class="header-container">
+    <h1>Calendario de Teletrabajo y Vacaciones — Área PMC</h1>
+  </div>
 
-<div class="sum-wrap">
-  <div class="sum-title">Resumen de teletrabajo</div>
-  <div class="cards-row" id="cards"></div>
-  <table class="day-table">
-    <thead>
-      <tr>
-        <th>Persona</th>
-        <th>Lunes</th>
-        <th>Martes</th>
-        <th>Miércoles</th>
-        <th>Jueves</th>
-        <th>Viernes</th>
-      </tr>
-    </thead>
-    <tbody id="daybody"></tbody>
-  </table>
-</div>
+  <div class="controls">
+    <div class="nav-mes">
+      <button class="btn" onclick="cambiarMes(-1)">◀ Ant</button>
+      <div class="mes-selector-btn" id="mes-actual" onclick="abrirPopDatePicker()">Conectando...</div>
+      <button class="btn" onclick="cambiarMes(1)">Sig ▶</button>
+    </div>
+
+    <div class="pop-datepicker" id="pop-picker">
+      <div class="pop-header">
+        <button class="btn" style="padding:2px 6px" onclick="cambiarAñoPop(-1)">◀</button>
+        <span class="pop-title" id="pop-year-lbl" onclick="conmutarVistaAño()">2026</span>
+        <button class="btn" style="padding:2px 6px" onclick="cambiarAñoPop(1)">▶</button>
+      </div>
+      <div class="pop-grid" id="pop-grid-content"></div>
+    </div>
+  </div>
+
+  <div class="leg" id="leyenda-filtros">
+    <span class="leg-lbl">📡 Filtrar Vista:</span>
+    <span class="pip p-an" data-user="An" onclick="alternarFiltro('An')">Andrés</span>
+    <span class="pip p-vi" data-user="Vi" onclick="alternarFiltro('Vi')">Victor</span>
+    <span class="pip p-me" data-user="Me" onclick="alternarFiltro('Me')">Mela</span>
+    <span class="pip p-my" data-user="My" onclick="alternarFiltro('My')">Mey</span>
+    <span class="pip p-ml" data-user="Ml" onclick="alternarFiltro('Ml')">Meli</span>
+    <span style="width:1px;height:14px;background:#dedad3;display:inline-block;margin:0 2px"></span>
+    <span class="pip p-vac" data-user="vac" onclick="alternarFiltro('vac')">🧳 Vacaciones</span>
+    <span class="pip p-fer" data-user="fer" onclick="alternarFiltro('fer')">Feriado / No laborable</span>
+  </div>
+
+  <div id="cal"></div>
+
+  <div class="sum-wrap">
+    <div class="sum-title" id="titulo-resumen">Resumen de teletrabajo</div>
+    <div class="cards-row" id="cards"></div>
+    <div class="table-responsive">
+      <table class="day-table">
+        <thead>
+          <tr>
+            <th>Persona</th>
+            <th><span class="d-long">Lunes</span><span class="d-short">L</span></th>
+            <th><span class="d-long">Martes</span><span class="d-short">M</span></th>
+            <th><span class="d-long">Miércoles</span><span class="d-short">Mi</span></th>
+            <th><span class="d-long">Jueves</span><span class="d-short">J</span></th>
+            <th><span class="d-long">Viernes</span><span class="d-short">V</span></th>
+          </tr>
+        </thead>
+        <tbody id="daybody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
+const SB_URL = "https://hyeolwwiauzeymsvgrvw.supabase.co"; 
+const SB_KEY = "sb_publishable_K-HFsBFpaFe9jLVr4fqU8g_4dC0Wd6Y";
+
 const P=1, T=0, F=-1;
 const DN=['Lun','Mar','Mié','Jue','Vie'];
+const M_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const M_SHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-const FLAB={
-  '2026-6-29':'San Pedro y San Pablo',
-  '2026-7-23':'Día FAP',
-  '2026-7-27':'No laborable',
-  '2026-7-28':'Fiestas Patrias',
-  '2026-7-29':'Fiestas Patrias'
-};
+let mesVisualizandose = new Date(2026, 5, 1); 
+let popAñoTemporal = 2026;
+let popModoAño = false;
 
-// Vacaciones: key = "YYYY-M-D", value = array de claves de persona en vacaciones ese día
-const VACACIONES={
-  // Meli: 30 jun – 14 jul
-  '2026-6-30':['Ml'],'2026-7-1':['Ml'],'2026-7-2':['Ml'],'2026-7-3':['Ml'],
-  '2026-7-6':['Ml'],'2026-7-7':['Ml'],'2026-7-8':['Ml'],'2026-7-9':['Ml'],'2026-7-10':['Ml'],
-  '2026-7-13':['Ml'],'2026-7-14':['Ml'],
-  // Mela: 30-31 jul
-  '2026-7-30':['Me'],'2026-7-31':['Me']
-};
+let DB_FERIADOS = {};
+let DB_VACACIONES = {};
+let DB_PROGRAMACION = [];
 
-// WK: [clave, nombre, clase-badge, clase-avatar, color]
+let filtrosActivos = new Set();
+
 const WK=[
-  ['An','Andrés','b-an','av-an','#0D4882'],
-  ['Vi','Victor','b-vi','av-vi','#2D6B2D'],
-  ['Me','Mela',  'b-me','av-me','#A0620A'],
-  ['My','Mey',   'b-my','av-my','#73303C'],
-  ['Ml','Meli',  'b-ml','av-ml','#004E5C'],
+  ['An','Andrés','b-an','av-an'],
+  ['Vi','Victor','b-vi','av-vi'],
+  ['Me','Mela',  'b-me','av-me'],
+  ['My','Mey',   'b-my','av-my'],
+  ['Ml','Meli',  'b-ml','av-ml']
 ];
 
 function fkey(d){return`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`}
-function addD(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r}
 
-// ─── SCHEDULE ───
-// Días cerrados y confirmados para An/Vi/Me/My — NO SE TOCAN
-// Meli (Ml): manual, solo aparece donde se indica; resto P
-// Intercambio semana 1: Andrés → Lunes (era Victor), Victor → Martes (era Andrés)
-const weeks=[
-  // ── S1: 15-19 jun ──
-  // Original: An=M,V / Vi=L,J / Me=M,J / My=X,V
-  // Intercambio: An pasa a L (donde estaba Vi), Vi pasa a M (donde estaba An)
-  // Resultado: An=L,V / Vi=M,J / Me=M,J / My=X,V
-  // Meli: tel Mar 16 y Jue 18
-  {label:'15 – 19 jun', month:5, note:'', start:new Date(2026,5,15),
-   days:[
-    {An:T, Vi:P, Me:P, My:P, Ml:P},   // Lun 15: Andrés tel
-    {An:P, Vi:T, Me:T, My:P, Ml:T},   // Mar 16: Victor, Mela, Meli tel
-    {An:P, Vi:P, Me:P, My:T, Ml:P},   // Mié 17: Mey tel
-    {An:P, Vi:T, Me:T, My:P, Ml:T},   // Jue 18: Victor, Mela, Meli tel
-    {An:T, Vi:P, Me:P, My:T, Ml:P},   // Vie 19: Andrés, Mey tel
-  ]},
+async function cargarDatosBase() {
+  try {
+    const headers = { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` };
+    const [resF, resV, resP] = await Promise.all([
+      fetch(`${SB_URL}/rest/v1/feriados?select=*`, { headers }),
+      fetch(`${SB_URL}/rest/v1/vacaciones?select=*`, { headers }),
+      fetch(`${SB_URL}/rest/v1/programacion?select=*`, { headers })
+    ]);
 
-  // ── S2: 22-26 jun ── (sin cambios)
-  {label:'22 – 26 jun', month:5, note:'', start:new Date(2026,5,22),
-   days:[
-    {An:T, Vi:P, Me:P, My:P, Ml:P},   // Lun 22
-    {An:P, Vi:T, Me:P, My:T, Ml:P},   // Mar 23
-    {An:T, Vi:P, Me:T, My:P, Ml:P},   // Mié 24
-    {An:P, Vi:P, Me:P, My:T, Ml:P},   // Jue 25
-    {An:P, Vi:T, Me:T, My:P, Ml:P},   // Vie 26
-  ]},
+    if (!resF.ok || !resV.ok || !resP.ok) throw new Error("Error en Supabase");
 
-  // ── S3: 29 jun – 3 jul (L feriado) ── (sin cambios)
-  // Meli: vacaciones desde 30 jun → aparece con 🌴 en los días que sea tel
-  {label:'29 jun – 3 jul', month:5, note:'1 feriado → máx 1 tel/persona', start:new Date(2026,5,29),
-   days:[
-    {An:F,  Vi:F,  Me:F,  My:F,  Ml:F},   // Lun 29: feriado
-    {An:T,  Vi:P,  Me:P,  My:P,  Ml:P},   // Mar 30: Andrés tel / Meli 🌴 (pres pero con vac icon si aplica — aquí Meli es P/pres, vacación se muestra si es T)
-    {An:P,  Vi:T,  Me:P,  My:P,  Ml:P},   // Mié  1: Victor tel
-    {An:P,  Vi:P,  Me:T,  My:P,  Ml:P},   // Jue  2: Mela tel
-    {An:P,  Vi:P,  Me:P,  My:T,  Ml:P},   // Vie  3: Mey tel
-  ]},
+    const rawFer = await resF.json();
+    DB_FERIADOS = {};
+    rawFer.forEach(f => { DB_FERIADOS[fkey(new Date(f.fecha + 'T00:00:00'))] = f.descripcion; });
 
-  // ── S4: 6-10 jul (Meli en vacaciones toda la semana) ──
-  {label:'6 – 10 jul', month:6, note:'', start:new Date(2026,6,6),
-   days:[
-    {An:P, Vi:T, Me:P, My:T, Ml:P},   // Lun  6
-    {An:T, Vi:P, Me:P, My:P, Ml:P},   // Mar  7
-    {An:P, Vi:T, Me:T, My:P, Ml:P},   // Mié  8
-    {An:T, Vi:P, Me:P, My:T, Ml:P},   // Jue  9
-    {An:P, Vi:P, Me:T, My:P, Ml:P},   // Vie 10
-  ]},
+    const rawVac = await resV.json();
+    DB_VACACIONES = {};
+    rawVac.forEach(v => {
+      let k = fkey(new Date(v.fecha + 'T00:00:00'));
+      if(!DB_VACACIONES[k]) DB_VACACIONES[k] = [];
+      DB_VACACIONES[k].push(v.usuario);
+    });
 
-  // ── S5: 13-17 jul (Meli regresa lunes 13, vac hasta 14 jul) ──
-  {label:'13 – 17 jul', month:6, note:'', start:new Date(2026,6,13),
-   days:[
-    {An:T, Vi:P, Me:T, My:P, Ml:P},   // Lun 13
-    {An:P, Vi:T, Me:P, My:T, Ml:P},   // Mar 14: Meli último día vac
-    {An:P, Vi:P, Me:P, My:P, Ml:P},   // Mié 15: todos pres
-    {An:P, Vi:T, Me:T, My:P, Ml:P},   // Jue 16
-    {An:T, Vi:P, Me:P, My:T, Ml:P},   // Vie 17
-  ]},
+    const rawProg = await resP.json();
+    DB_PROGRAMACION = rawProg.map(p => ({
+      fecha: fkey(new Date(p.fecha + 'T00:00:00')),
+      An: p.An, Vi: p.Vi, Me: p.Me, My: p.My, Ml: p.Ml
+    }));
 
-  // ── S6: 20-24 jul (Jue 23 feriado) ──
-  {label:'20 – 24 jul', month:6, note:'1 feriado (jue 23) → máx 1 tel/persona', start:new Date(2026,6,20),
-   days:[
-    {An:P, Vi:P, Me:T, My:P, Ml:P},   // Lun 20
-    {An:P, Vi:P, Me:P, My:T, Ml:P},   // Mar 21
-    {An:T, Vi:P, Me:P, My:P, Ml:P},   // Mié 22
-    {An:F, Vi:F, Me:F, My:F, Ml:F},   // Jue 23: feriado FAP
-    {An:P, Vi:T, Me:P, My:P, Ml:P},   // Vie 24
-  ]},
-
-  // ── S7: 27-31 jul (L-X feriados, Mela vac Jue+Vie) ──
-  {label:'27 – 31 jul', month:6, note:'3 feriados → todos presencial jue y vie', start:new Date(2026,6,27),
-   days:[
-    {An:F, Vi:F, Me:F, My:F, Ml:F},   // Lun 27: no laborable
-    {An:F, Vi:F, Me:F, My:F, Ml:F},   // Mar 28: Fiestas Patrias
-    {An:F, Vi:F, Me:F, My:F, Ml:F},   // Mié 29: Fiestas Patrias
-    {An:P, Vi:P, Me:P, My:P, Ml:P},   // Jue 30: todos pres (Mela 🌴 aparece si tel — es pres)
-    {An:P, Vi:P, Me:P, My:P, Ml:P},   // Vie 31: todos pres (Mela 🌴 aparece si tel — es pres)
-  ]},
-];
-
-const SCLS={An:'b-an',Vi:'b-vi',Me:'b-me',My:'b-my',Ml:'b-ml'};
-const telC={An:0,Vi:0,Me:0,My:0,Ml:0};
-const telDay={An:[0,0,0,0,0],Vi:[0,0,0,0,0],Me:[0,0,0,0,0],My:[0,0,0,0,0],Ml:[0,0,0,0,0]};
-
-const cal=document.getElementById('cal');
-let lastM=null;
-
-weeks.forEach(wk=>{
-  if(wk.month!==lastM){
-    const mh=document.createElement('div');
-    mh.className='mhdr';
-    mh.textContent=wk.month===5?'Junio 2026':'Julio 2026';
-    cal.appendChild(mh);
-    lastM=wk.month;
+    renderizarCalendario();
+  } catch (error) {
+    console.error(error);
+    alert("Error de sincronización con las tablas de Supabase.");
   }
-  const wb=document.createElement('div');wb.className='wb';
-  const wl=document.createElement('div');wl.className='wlbl';wl.textContent=wk.label;
-  if(wk.note){
-    const wn=document.createElement('span');wn.className='wnote';wn.textContent=wk.note;wl.appendChild(wn);
-  }
-  wb.appendChild(wl);
-  const grid=document.createElement('div');grid.className='grid';
+}
 
-  wk.days.forEach((slot,i)=>{
-    const date=addD(wk.start,i);
-    const key=fkey(date);
-    const isFer=slot.An===F;
-    const telWorkers=WK.filter(([k])=>slot[k]===T);
-    const vacHoy=VACACIONES[key]||[];
+function renderizarCalendario() {
+  const cal = document.getElementById('cal'); cal.innerHTML = '';
+  document.getElementById('mes-actual').textContent = `${M_NAMES[mesVisualizandose.getMonth()]} ${mesVisualizandose.getFullYear()}`;
+  popAñoTemporal = mesVisualizandose.getFullYear();
 
-    const col=document.createElement('div');
-    col.className='dc'+(isFer?' feriado':'');
+  const telC={An:0,Vi:0,Me:0,My:0,Ml:0}, telDay={An:[0,0,0,0,0],Vi:[0,0,0,0,0],Me:[0,0,0,0,0],My:[0,0,0,0,0],Ml:[0,0,0,0,0]};
+  
+  const mes = mesVisualizandose.getMonth(), año = mesVisualizandose.getFullYear();
+  let curr = new Date(año, mes, 1);
+  curr.setDate(curr.getDate() - (curr.getDay() === 0 ? 6 : curr.getDay() - 1)); 
+  let hasta = new Date(año, mes + 1, 0);
+  hasta.setDate(hasta.getDate() + (hasta.getDay() === 0 ? 0 : 7 - hasta.getDay())); 
 
-    const dd=document.createElement('div');dd.className='dc-day';dd.textContent=DN[i];
-    const dn=document.createElement('div');dn.className='dc-num';dn.textContent=date.getDate();
-    col.appendChild(dd);col.appendChild(dn);
+  const tieneFiltrosNombres = WK.some(([k]) => filtrosActivos.has(k));
+  const tieneFiltroVac = filtrosActivos.has('vac');
+  const tieneFiltroFer = filtrosActivos.has('fer');
+  const modoAislamiento = filtrosActivos.size > 0;
 
-    if(isFer){
-      const ft=document.createElement('div');ft.className='fer-lbl';
-      ft.textContent='✕  '+(FLAB[key]||'No laborable');
-      col.appendChild(ft);
-    } else {
-      // Mostrar personas en teletrabajo
-      const bl=document.createElement('div');bl.className='tel-list';
-      let hasTel=false;
-
-      telWorkers.forEach(([k,name])=>{
-        const b=document.createElement('span');
-        b.className='b '+SCLS[k];
-        const isVac=vacHoy.includes(k);
-        b.textContent=name+(isVac?' 🌴':'');
-        bl.appendChild(b);
-        telC[k]++;
-        telDay[k][i]++;
-        hasTel=true;
-      });
-
-      // Mostrar Meli con 🌴 aunque esté presencial (para que se vea que está de vac)
-      if(!isFer && vacHoy.includes('Ml') && slot['Ml']!==T){
-        const b=document.createElement('span');
-        b.className='b b-ml';
-        b.style.opacity='0.6';
-        b.textContent='Meli 🌴';
-        bl.appendChild(b);
-        hasTel=true;
-      }
-      // Idem para Mela
-      if(!isFer && vacHoy.includes('Me') && slot['Me']!==T){
-        const b=document.createElement('span');
-        b.className='b b-me';
-        b.style.opacity='0.6';
-        b.textContent='Mela 🌴';
-        bl.appendChild(b);
-        hasTel=true;
-      }
-
-      if(!hasTel){
-        const tl=document.createElement('div');
-        tl.style.cssText='font-size:9px;color:#d0cdc7;font-style:italic;margin-top:2px';
-        tl.textContent='—';
-        bl.appendChild(tl);
-      }
-      col.appendChild(bl);
+  while(curr < hasta) {
+    let tieneDiasDelMes = false;
+    for(let i=0; i<5; i++) {
+      let check = new Date(curr); check.setDate(check.getDate() + i);
+      if(check.getMonth() === mes) tieneDiasDelMes = true;
     }
-    grid.appendChild(col);
+    if(!tieneDiasDelMes) { curr.setDate(curr.getDate() + 7); continue; }
+
+    const wb = document.createElement('div'); wb.className = 'wb';
+    const wl = document.createElement('div'); wl.className = 'wlbl';
+    let fIni = new Date(curr), fFin = new Date(curr); fFin.setDate(fFin.getDate() + 4);
+    
+    let habiles = 0;
+    for(let i=0; i<5; i++){
+      let chk = new Date(curr); chk.setDate(chk.getDate()+i);
+      if(!DB_FERIADOS[fkey(chk)] && dataDiaIn_k(fkey(chk)) !== F) habiles++;
+    }
+    let nota = habiles === 5 ? "" : habiles >= 4 ? "1 feriado → máx 1 tel/persona" : habiles > 0 ? "Varios feriados → todos en presencial" : "todos en presencial";
+    wl.innerHTML = `${fIni.getDate()} ${M_NAMES[fIni.getMonth()].substring(0,3)} – ${fFin.getDate()} ${M_NAMES[fFin.getMonth()].substring(0,3)}`;
+    if(nota) wl.innerHTML += `<span class="wnote">${nota}</span>`;
+    wb.appendChild(wl);
+
+    const grid = document.createElement('div'); grid.className = 'grid';
+    for(let i=0; i<5; i++) {
+      let d = new Date(curr); d.setDate(d.getDate() + i); let key = fkey(d);
+      
+      let dataDia = DB_PROGRAMACION.find(x => x.fecha === key) || null;
+      let isFer = DB_FERIADOS[key] || (dataDia && dataDia.An === F);
+      let vacHoy = DB_VACACIONES[key] || [];
+
+      const col = document.createElement('div'); col.className = 'dc' + (isFer ? ' feriado' : '');
+      
+      if(modoAislamiento) {
+        if(tieneFiltroFer && !isFer) col.classList.add('atenuado');
+        if(!tieneFiltroFer && isFer) col.classList.add('atenuado');
+      }
+
+      col.innerHTML = `<div class="dc-header-row"><div class="dc-day">${DN[i]}</div><div class="dc-num">${d.getDate()}</div></div>`;
+
+      if(isFer) {
+        let ferLblCls = (modoAislamiento && !tieneFiltroFer) ? 'fer-lbl atenuado' : 'fer-lbl';
+        col.innerHTML += `<div class="${ferLblCls}">✕ ${DB_FERIADOS[key] || 'No laborable'}</div>`;
+      } else {
+        const bl = document.createElement('div'); bl.className = 'tel-list';
+        let bloquesAgregados = 0;
+
+        WK.forEach(([k, name, bcls]) => {
+          let esT = dataDia && dataDia[k] === T;
+          let isVac = vacHoy.includes(k);
+
+          // Renderizar Teletrabajo
+          if (esT) {
+            let debeAtenuarse = false;
+            if (modoAislamiento) {
+              if (tieneFiltroFer || tieneFiltroVac) {
+                debeAtenuarse = true;
+              } else if (tieneFiltrosNombres) {
+                debeAtenuarse = !filtrosActivos.has(k);
+              }
+            }
+
+            const b = document.createElement('span'); b.className = `b ${bcls}`;
+            b.textContent = name;
+            if (debeAtenuarse) b.classList.add('atenuado');
+            
+            bl.appendChild(b);
+            bloquesAgregados++;
+
+            if (!debeAtenuarse) {
+              telC[k]++; telDay[k][i]++;
+            }
+          }
+
+          // Renderizar Vacaciones heredando su color nativo
+          if (isVac) {
+            let debeAtenuarse = false;
+            if (modoAislamiento) {
+              if (tieneFiltroFer) {
+                debeAtenuarse = true;
+              } else if (tieneFiltrosNombres && tieneFiltroVac) {
+                debeAtenuarse = !(filtrosActivos.has(k) && filtrosActivos.has('vac'));
+              } else if (tieneFiltrosNombres) {
+                debeAtenuarse = !filtrosActivos.has(k);
+              } else if (tieneFiltroVac) {
+                debeAtenuarse = false; 
+              }
+            }
+
+            const b = document.createElement('span'); b.className = `b ${bcls}`;
+            b.textContent = `${name} 🧳`;
+            b.style.opacity = debeAtenuarse ? '' : '0.55';
+            if (debeAtenuarse) b.classList.add('atenuado');
+
+            bl.appendChild(b);
+            bloquesAgregados++;
+          }
+        });
+
+        if(bloquesAgregados === 0) bl.innerHTML = `<div style="font-size:9px;color:#d0cdc7;font-style:italic;text-align:center;width:100%">—</div>`;
+        col.appendChild(bl);
+      }
+      grid.appendChild(col);
+    }
+    wb.appendChild(grid); cal.appendChild(wb); curr.setDate(curr.getDate() + 7);
+  }
+  
+  actualizarMétricas(telC, telDay);
+  actualizarEstiloPíldorasLeyenda();
+}
+
+function dataDiaIn_k(f) { let x = DB_PROGRAMACION.find(d=>d.fecha===f); return x ? x.An : P; }
+
+function actualizarMétricas(telC, telDay) {
+  const cardsEl = document.getElementById('cards'); cardsEl.innerHTML = '';
+  WK.forEach(([k,name,,avcls]) => {
+    cardsEl.innerHTML += `<div class="sc"><div class="sc-avatar ${avcls}">${name[0]}</div><div class="sc-n">${name}</div><div class="sc-v">${telC[k]}</div><div class="sc-s">días teletrabajo</div></div>`;
   });
-  wb.appendChild(grid);
-  cal.appendChild(wb);
+  const tbody = document.getElementById('daybody'); tbody.innerHTML = '';
+  WK.forEach(([k,name,,avcls]) => {
+    let r = `<tr><td><div class="person-cell"><div class="avatar-sm ${avcls}">${name[0]}</div><span style="font-weight:600">${name}</span></div></td>`;
+    [0,1,2,3,4].forEach(i=> r += `<td><span class="num-cell">${telDay[k][i]}</span></td>`);
+    tbody.innerHTML += r + `</tr>`;
+  });
+}
+
+function cambiarMes(dir) { 
+  mesVisualizandose.setMonth(mesVisualizandose.getMonth() + dir); 
+  renderizarCalendario(); 
+}
+
+function alternarFiltro(tipo) {
+  if (filtrosActivos.has(tipo)) {
+    filtrosActivos.delete(tipo);
+  } else {
+    filtrosActivos.add(tipo);
+  }
+  renderizarCalendario();
+}
+
+function actualizarEstiloPíldorasLeyenda() {
+  const pips = document.querySelectorAll('#leyenda-filtros .pip[data-user]');
+  const modoAislamiento = filtrosActivos.size > 0;
+  
+  pips.forEach(p => {
+    const userKey = p.getAttribute('data-user');
+    if (modoAislamiento) {
+      if (filtrosActivos.has(userKey)) {
+        p.classList.remove('atenuado');
+        p.style.transform = 'scale(1.02)';
+      } else {
+        p.classList.add('atenuated', 'atenuado');
+        p.style.transform = 'scale(1)';
+      }
+    } else {
+      p.classList.remove('atenuado');
+      p.style.transform = 'scale(1)';
+    }
+  });
+}
+
+function abrirPopDatePicker() {
+  const picker = document.getElementById('pop-picker');
+  if(picker.style.display === 'block') {
+    picker.style.display = 'none';
+    return;
+  }
+  popAñoTemporal = mesVisualizandose.getFullYear();
+  popModoAño = false;
+  picker.style.display = 'block';
+  dibujarContenidoPopGrid();
+}
+
+function cambiarAñoPop(dir) {
+  if(popModoAño) {
+    popAñoTemporal += dir * 12;
+  } else {
+    popAñoTemporal += dir;
+  }
+  document.getElementById('pop-year-lbl').textContent = popAñoTemporal;
+  dibujarContenidoPopGrid();
+}
+
+function conmutarVistaAño() {
+  popModoAño = !popModoAño;
+  dibujarContenidoPopGrid();
+}
+
+function dibujarContenidoPopGrid() {
+  const grid = document.getElementById('pop-grid-content');
+  grid.innerHTML = '';
+  document.getElementById('pop-year-lbl').textContent = popAñoTemporal;
+
+  if (!popModoAño) {
+    M_SHORT.forEach((m, idx) => {
+      const cell = document.createElement('div');
+      cell.className = 'pop-cell';
+      if(mesVisualizandose.getMonth() === idx && mesVisualizandose.getFullYear() === popAñoTemporal) {
+        cell.classList.add('active');
+      }
+      cell.textContent = m;
+      cell.onclick = () => {
+        mesVisualizandose = new Date(popAñoTemporal, idx, 1);
+        document.getElementById('pop-picker').style.display = 'none';
+        renderizarCalendario();
+      };
+      grid.appendChild(cell);
+    });
+} else {
+    let añoInicio = popAñoTemporal - 5;
+    for(let i=0; i<12; i++) {
+      let a = añoInicio + i;
+      const cell = document.createElement('div');
+      cell.className = 'pop-cell';
+      if(mesVisualizandose.getFullYear() === a) {
+        cell.classList.add('active');
+      }
+      cell.textContent = a;
+      cell.onclick = (e) => {
+        e.stopPropagation(); //
+        popAñoTemporal = a;
+        popModoAño = false;
+        dibujarContenidoPopGrid();
+      };
+      grid.appendChild(cell);
+    }
+  }
+}
+
+document.addEventListener('click', function(event) {
+  const picker = document.getElementById('pop-picker');
+  const mesActual = document.getElementById('mes-actual');
+  
+  if (picker && !picker.contains(event.target) && !mesActual.contains(event.target)) {
+    picker.style.display = 'none';
+  }
 });
 
-// ── Tarjetas totales ──
-const cardsEl=document.getElementById('cards');
-WK.forEach(([k,name,,avcls])=>{
-  const sc=document.createElement('div');sc.className='sc';
-  const av=document.createElement('div');av.className='sc-avatar '+avcls;
-  av.textContent=name[0];
-  const nm=document.createElement('div');nm.className='sc-n';nm.textContent=name;
-  const tv=document.createElement('div');tv.className='sc-v';tv.textContent=telC[k];
-  const sub=document.createElement('div');sub.className='sc-s';sub.textContent='días teletrabajo';
-  sc.appendChild(av);sc.appendChild(nm);sc.appendChild(tv);sc.appendChild(sub);
-  cardsEl.appendChild(sc);
-});
-
-// ── Tabla: filas=personas, columnas=días ──
-const tbody=document.getElementById('daybody');
-WK.forEach(([k,name,bcls,avcls])=>{
-  const tr=document.createElement('tr');
-  const tdName=document.createElement('td');
-  tdName.innerHTML=`<div class="person-cell"><div class="avatar-sm ${avcls}">${name[0]}</div><span style="font-weight:600;color:#1a1917">${name}</span></div>`;
-  tr.appendChild(tdName);
-  [0,1,2,3,4].forEach(i=>{
-    const td=document.createElement('td');
-    td.innerHTML=`<span class="num-cell">${telDay[k][i]}</span>`;
-    tr.appendChild(td);
-  });
-  tbody.appendChild(tr);
-});
+window.onload = cargarDatosBase;
 </script>
 </body>
 </html>
